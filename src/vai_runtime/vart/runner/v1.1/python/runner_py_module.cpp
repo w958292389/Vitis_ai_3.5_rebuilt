@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#include <11/numpy.h>
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 

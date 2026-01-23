@@ -32,11 +32,7 @@ add_executable(
   cmd_dump_code.cpp
   cmd_graph.hpp
   cmd_graph.cpp)
-<<<<<<< HEAD
-target_link_libraries(xir_util xir protobuf::libprotobuf unilog::unilog  )
-=======
 target_link_libraries(xir_util xir protobuf::libprotobuf unilog::unilog  absl::log_internal_check_op absl::log)
->>>>>>> origin/master
 target_include_directories(xir_util
                            PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../src/xir)
 set_target_properties(xir_util PROPERTIES OUTPUT_NAME xir)

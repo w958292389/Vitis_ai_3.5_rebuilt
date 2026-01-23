@@ -19,11 +19,7 @@
 #include <xrt/xrt_bo.h>
 #include <xrt/xrt_device.h>
 #include <xrt/xrt_kernel.h>
-<<<<<<< HEAD
-#include <algorithm>
-=======
 
->>>>>>> origin/master
 #include <array>
 #include <iostream>
 
@@ -36,19 +32,6 @@ int main(int argc, char* argv[]) {
   auto bo1 = xrt::bo(device, 25u * 1024 * 1024, 0);
   auto data1 = bo1.map<char*>();
   auto phy1 = bo1.address();
-<<<<<<< HEAD
-  std::generate(data1, data1 + bo1.size(), []() { return rand() % 256; });  
-  LOG(INFO) << "bo1 data 0x" << std::hex << data1 << " phy 0x" << phy1
-            << std::dec << ", actual size " << bo1.size();
-  
-  LOG(INFO) << "bo2 4u*1024*1024 alloating in memgroup(1)...";
-  auto bo2 = xrt::bo(device, 4u * 1024 * 1024, 1);
-  auto data2 = bo2.map<void*>();
-  auto phy2 = bo2.address();
-  LOG(INFO) << "bo2 data 0x" << std::hex << data2 << " phy 0x" << phy2
-            << std::dec << ", actual size " << bo2.size();
-
-=======
   LOG(INFO) << "bo1 data 0x" << std::hex << data1 << " phy 0x" << phy1
             << std::dec << ", actual size " << bo1.size();
 
@@ -59,7 +42,6 @@ int main(int argc, char* argv[]) {
   LOG(INFO) << "bo2 data 0x" << std::hex << data2 << " phy 0x" << phy2
             << std::dec << ", actual size " << bo2.size();
 
->>>>>>> origin/master
   auto h = xir::XrtDeviceHandle::get_instance();
   std::string cu = "DPU";
   auto* dev = reinterpret_cast<const xrt::device*>(h->get_device_handle(cu, 0));

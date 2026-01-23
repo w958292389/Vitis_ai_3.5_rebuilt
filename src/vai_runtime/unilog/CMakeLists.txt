@@ -13,16 +13,10 @@
 # the License.
 
 cmake_minimum_required(VERSION 3.5)
-<<<<<<< HEAD
-project(unilog VERSION 4.0.0 LANGUAGES C CXX)
-=======
 project(unilog VERSION 5.0.0 LANGUAGES C CXX)
->>>>>>> origin/master
 
 include(${PROJECT_SOURCE_DIR}/cmake/VitisCommon.cmake)
 include(${PROJECT_SOURCE_DIR}/cmake/vai_add_pybind11_module.cmake)
-set(CPACK_STRIP_FILES OFF)
-
 
 option(BUILD_TEST "build test" OFF)
 option(LIBGLOG_RESTRICT "find libglog restrict in install prefix" OFF)
@@ -63,6 +57,7 @@ install(
 if(BUILD_TEST)
   add_subdirectory(test)
 endif()
+
 set(CPACK_PACKAGE_NAME "libunilog")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A wrapper for glog")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
@@ -102,7 +97,6 @@ set(CPACK_RPM_FILE_NAME RPM-DEFAULT)
 if(DEFINED ENV{BUILD_NUMBER})
   set(CPACK_RPM_PACKAGE_RELEASE "r$ENV{BUILD_NUMBER}")
 endif()
-
 set(CPACK_RPM_PACKAGE_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortexa72-cortexa53")
     set(CPACK_RPM_PACKAGE_ARCHITECTURE "aarch64")
@@ -115,22 +109,3 @@ if(BUILD_PYTHON)
   target_link_libraries(py_unilog PRIVATE glog::glog)
   target_compile_options(py_unilog PUBLIC $<$<CONFIG:DEBUG>:-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0>)
 endif(BUILD_PYTHON)
-
-set(CPACK_STRIP_FILES OFF)  # 禁止 CPack 主动 strip
-
-set(CPACK_RPM_SPEC_MORE_DEFINE "
-%define __strip /bin/true
-%define __brp_strip /bin/true
-%define __brp_strip_static_archive /bin/true
-%define __brp_strip_comment_note /bin/true
-%define __brp_strip_debug /bin/true
-%define __brp_strip_lto /bin/true
-%define __brp_strip_shared /bin/true
-%define __brp_strip_non_exec /bin/true
-%define __brp_strip_binary /bin/true
-%define __brp_strip_rescue /bin/true
-%define __brp_strip_static /bin/true
-%define __brp_strip_compress_debug /bin/true
-%define __brp_compress :
-")
-

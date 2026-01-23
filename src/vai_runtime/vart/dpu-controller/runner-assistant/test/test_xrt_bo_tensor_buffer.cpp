@@ -22,10 +22,6 @@
 // xrt.h must be included after. otherwise, name pollution.
 #include <xrt/xrt_bo.h>
 #include <xrt/xrt_device.h>
-<<<<<<< HEAD
-#include <xrt/xrt_kernel.h>
-=======
->>>>>>> origin/master
 using namespace std;
 int main(int argc, char* argv[]) {
   auto graph = xir::Graph::deserialize(argv[1]);
@@ -39,19 +35,8 @@ int main(int argc, char* argv[]) {
   }
 
   auto dev = std::make_shared<xrt::device>(0);
-<<<<<<< HEAD
-  // auto dev = xrt::device>(0);
-  // auto xclbin = xrt::xclbin(std::string("/system/dpu3d.xclbin"));
-  // auto uuid = dev->register_xclbin(xclbin);
-  // xrt::hw_context hwctx(*dev, uuid);
-  // auto krnl = xrt::kernel(hwctx, "DPUCVDX8G");
-  auto input_tensor_buffer_size = vart::get_input_buffer_size(s);
-  auto bo = std::make_unique<xrt::bo>(*dev, input_tensor_buffer_size,0, 1);
-  auto bo_new = std::make_unique<xrt::bo>(*dev, input_tensor_buffer_size,0, 1);
-=======
   auto input_tensor_buffer_size = vart::get_input_buffer_size(s);
   auto bo = std::make_unique<xrt::bo>(*dev, input_tensor_buffer_size, 1);
->>>>>>> origin/master
   auto tensors = s->get_sorted_output_tensors();
   CHECK(!tensors.empty());
   auto tensor = *tensors.begin();
@@ -59,26 +44,12 @@ int main(int argc, char* argv[]) {
   LOG(INFO) << "tensor = " << tensor->to_string();
   auto tensor_buffer = vart::assistant::XrtBoTensorBuffer::create(
       vart::xrt_bo_t{dev.get(), bo.get()}, tensor);
-<<<<<<< HEAD
-  auto tensor_buffer_new = vart::assistant::XrtBoTensorBuffer::create(
-      vart::xrt_bo_t{dev.get(), bo_new.get()}, tensor);
-=======
->>>>>>> origin/master
   LOG(INFO) << "tensor_buffer=" << tensor_buffer->to_string();
   auto data_phy = tensor_buffer->data_phy({0, 0, 0, 0});
-  auto data_phy_new = tensor_buffer_new->data_phy({0, 0, 0, 0});
-  
   LOG(INFO) << "phy = " << std::hex << "0x" << data_phy.first << std::dec
             << " data_size=" << data_phy.second
             << " request bo_size=" << input_tensor_buffer_size
             << " allocated bo_size= " << bo->size();
-<<<<<<< HEAD
-  LOG(INFO) << "phy = " << std::hex << "0x" << data_phy_new.first << std::dec
-            << " data_size=" << data_phy_new.second
-            << " request bo_size=" << input_tensor_buffer_size
-            << " allocated bo_size= " << bo_new->size();
-=======
->>>>>>> origin/master
   CHECK_LE(input_tensor_buffer_size, bo->size())
       << "allcate and request size mismatch";
   return 0;

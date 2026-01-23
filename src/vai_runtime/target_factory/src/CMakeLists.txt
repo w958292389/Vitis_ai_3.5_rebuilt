@@ -91,11 +91,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   $<INSTALL_INTERFACE:include>
 )
-<<<<<<< HEAD
-target_link_libraries(${PROJECT_NAME} PUBLIC   protobuf::libprotobuf PRIVATE unilog::unilog)
-=======
 target_link_libraries(${PROJECT_NAME} PUBLIC   absl::log_internal_check_op absl::log protobuf::libprotobuf PRIVATE unilog::unilog)
->>>>>>> origin/master
 if(NOT MSVC)
   if(Protobuf_USE_STATIC_LIBS)
     target_link_options(${PROJECT_NAME} PRIVATE -Wl,--exclude-libs,ALL)

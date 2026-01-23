@@ -17,11 +17,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(
   xir
-<<<<<<< HEAD
-  VERSION 4.0.0
-=======
   VERSION 5.0.0
->>>>>>> origin/master
   LANGUAGES C CXX)
 
 include(${PROJECT_SOURCE_DIR}/cmake/VitisCommon.cmake)
@@ -102,7 +98,7 @@ elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
 else()
   set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
 endif()
-set(RPM_BUILD_NCPUS 4)
+
 set(CPACK_RPM_COMPONENT_INSTALL OFF)
 set(CPACK_RPM_PACKAGE_LICENSE "Apache")
 set(CPACK_RPM_PACKAGE_GROUP "Development/Tools")

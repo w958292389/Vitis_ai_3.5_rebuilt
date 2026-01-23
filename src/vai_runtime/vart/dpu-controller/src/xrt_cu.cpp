@@ -132,9 +132,7 @@ static std::string ert_state_to_string(ert_cmd_state state) {
 }
 
 void XrtCu::run(size_t device_core_idx, XrtCu::prepare_ecmd_t prepare,
-                callback_t on_success, callback_t on_failure = []() {
-           LOG(WARNING) << "[XrtCu] DPU execution timeout! No handler provided.";
-         }) {
+                callback_t on_success, callback_t on_failure) {
   UNI_LOG_CHECK(bo_handles_.size() > 0u, VART_XRT_DEVICE_BUSY)
       << "no cu availabe. cu_name=" << cu_name_;
   struct timespec tp;
@@ -182,25 +180,16 @@ void XrtCu::run(size_t device_core_idx, XrtCu::prepare_ecmd_t prepare,
       LOG_IF(INFO, ENV_PARAM(DEBUG_XRT_CU) >= 2)
           << "wait state is " << ert_state_to_string(state)  //
           << " in " << count << "s";
-<<<<<<< HEAD
-          is_done = true;
-      // if (state >= ERT_CMD_STATE_COMPLETED && state != ERT_CMD_STATE_TIMEOUT) {
-      //   is_done = true;
-      // }
-=======
       if (state >= ERT_CMD_STATE_COMPLETED && state != ERT_CMD_STATE_TIMEOUT) {
         is_done = true;
       }
->>>>>>> origin/master
       if (!is_done) {
         auto now = std::chrono::steady_clock::now();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                       now - start_from)
                       .count();
         if (ms > ENV_PARAM(XLNX_DPU_TIMEOUT)) {
-
-          LOG(INFO)<<"====================dpu time out need to be reset=============================";
-          return ;
+          break;
         }
       }
       count++;

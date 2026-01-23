@@ -17,7 +17,6 @@
 #include <cassert>
 #include <cstdint>
 #include <sstream>
-#include <cstdint>
 namespace vitis {
 namespace ai {
 template <typename T>

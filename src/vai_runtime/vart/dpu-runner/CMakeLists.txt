@@ -107,7 +107,7 @@ install(
   NAMESPACE ${PROJECT_NAME}::
   COMPONENT dpu
   DESTINATION share/cmake/${PROJECT_NAME})
-add_subdirectory(test)
+
 # install(DIRECTORY samples DESTINATION share/vart)
 
 if(BUILD_TEST)

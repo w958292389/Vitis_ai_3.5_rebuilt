@@ -16,11 +16,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(
   vart
-<<<<<<< HEAD
-  VERSION 4.0.0
-=======
   VERSION 5.0.0
->>>>>>> origin/master
   LANGUAGES C CXX)
 
 link_directories("$ENV{CONDA_PREFIX}/lib")
@@ -32,11 +28,7 @@ option(ENABLE_DPU_RUNNER "enable dpu runner or not" ON)
 option(ENABLE_XRNN_RUNNER "enable xrnn runner or not" OFF)
 option(ENABLE_RNN_RUNNER "enable rnn runner or not" OFF)
 option(BUILD_PYTHON "build python library" OFF)
-<<<<<<< HEAD
-option(BUILD_TEST "build test" ON)
-=======
 option(BUILD_TEST "build test" OFF)
->>>>>>> origin/master
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
 find_package(glog QUIET)
@@ -54,10 +46,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${PROJECT_SOURCE_DIR})
 endif()
 find_package(Threads REQUIRED)
 #find_package(XRT HINTS /opt/xilinx/xrt/share/cmake/XRT)
-<<<<<<< HEAD
-=======
 find_package(absl REQUIRED)
->>>>>>> origin/master
 if(XRT_FOUND)
   if(TARGET XRT::xrt_coreutil)
     # it brreaks all other runners if XRT obsolete this target.

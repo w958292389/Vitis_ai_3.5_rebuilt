@@ -53,22 +53,13 @@ DEF_ENV_PARAM_2(XLNX_VART_FIRMWARE, "", std::string);
 namespace {
 
 const std::string get_dpu_xclbin() {
-  // For mindray to use XLNX_VART_FIRMWARE
-  const char* firmware_path = std::getenv("XLNX_VART_FIRMWARE");
-  if (firmware_path && std::string(firmware_path).length() > 0) {
-    return std::string(firmware_path);
-  }
   auto ret = std::string("/usr/lib/dpu.xclbin");
   if (!ENV_PARAM(XLNX_VART_FIRMWARE).empty()) {
     ret = ENV_PARAM(XLNX_VART_FIRMWARE);
     return ret;
   }
-
-
   auto config =
       vitis::ai::SimpleConfig::getOrCreateSimpleConfig("/etc/vart.conf");
-
- 
   if (!config) {
     LOG_IF(INFO, ENV_PARAM(DEBUG_XRT_DEVICE_HANDLE))
         << "/etc/vart.conf does not exits. use default value "
