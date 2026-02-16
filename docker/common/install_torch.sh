@@ -6,7 +6,9 @@ set -ex
 if [[ ${VAI_CONDA_CHANNEL} =~ .*"tar.gz" ]]; then 
        cd /scratch/;
 
-       wget -O conda-channel.tar.gz --progress=dot:mega ${VAI_CONDA_CHANNEL}; 
+       wget -O conda-channel.tar.gz --progress=dot:mega \
+           --retry-connrefused --waitretry=5 --read-timeout=120 --timeout=60 -t 5 \
+           "${VAI_CONDA_CHANNEL}";
        tar -xzvf conda-channel.tar.gz; 
        export VAI_CONDA_CHANNEL=file:///scratch/conda-channel; 
 fi

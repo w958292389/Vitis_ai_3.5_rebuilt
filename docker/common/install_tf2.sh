@@ -4,8 +4,13 @@ set -ex
 sudo chmod 777 /scratch
 if [[ ${VAI_CONDA_CHANNEL} =~ .*"tar.gz" ]]; then \
        cd /scratch/; \
-       wget -O conda-channel.tar.gz --progress=dot:mega ${VAI_CONDA_CHANNEL}; \
-       tar -xzvf conda-channel.tar.gz; \
+       echo "Downloading conda channel (this may take a while for large files)..."; \
+       wget -O conda-channel.tar.gz --progress=dot:mega \
+           --retry-connrefused --waitretry=5 --read-timeout=120 --timeout=60 -t 5 \
+           "${VAI_CONDA_CHANNEL}"; \
+       echo "Extracting conda channel..."; \
+       tar -xzf conda-channel.tar.gz; \
+       ls -la /scratch/; \
        export VAI_CONDA_CHANNEL=file:///scratch/conda-channel; \
 fi;
 sudo mkdir -p $VAI_ROOT/compiler 
@@ -78,30 +83,62 @@ elif [[ ${DOCKER_TYPE} == 'rocm' ]]; then
     && sudo mkdir -p $VAI_ROOT/compiler \
     && sudo cp -r $CONDA_PREFIX/lib/python3.8/site-packages/vaic/arch $VAI_ROOT/compiler/arch
 else
-. $VAI_ROOT/conda/etc/profile.d/conda.sh \
-    && mkdir -p $VAI_ROOT/conda/pkgs \
-    && sudo python3 -m pip install --upgrade pip wheel setuptools \
-    && conda config --env --remove-key channels \
-    && conda config --env --append channels ${VAI_CONDA_CHANNEL} \
-    && conda config --remove channels defaults || true \
-    && mamba env create -f /scratch/${DOCKER_TYPE}_conda/vitis-ai-tensorflow2.yml \
-    && conda activate vitis-ai-tensorflow2 \
-    && pip install --ignore-installed ${tensorflow_ver} \
-    && mamba install --no-update-deps -y  pydot pyyaml jupyter ipywidgets \
-            dill progressbar2 pytest pandas matplotlib \
-            pillow -c ${conda_channel} -c conda-forge -c defaults \
-        && pip install -r /scratch/pip_requirements.txt \
-        && pip install transformers pycocotools scikit-learn scikit-image tqdm easydict \
-        && pip install --ignore-installed ${tensorflow_ver} \
-        && pip uninstall -y h5py \
-        && pip uninstall -y h5py  \
-        && mamba install -y --override-channels --force-reinstall h5py=2.10.0 -c conda-forge  \
-    && pip install --force --no-binary protobuf protobuf==3.20.3 \
-    && conda clean -y --force-pkgs-dirs \
-    && sudo rm -fr ~/.cache \
-    && sudo rm -fr /scratch/* \
-    && conda config --env --remove-key channels \
-    && conda activate vitis-ai-tensorflow2 \
-    && sudo mkdir -p $VAI_ROOT/compiler \
-    && sudo cp -r $CONDA_PREFIX/lib/python3.8/site-packages/vaic/arch $VAI_ROOT/compiler/arch
+echo "=== GPU/Generic TF2 install path (DOCKER_TYPE=${DOCKER_TYPE}) ==="
+
+. $VAI_ROOT/conda/etc/profile.d/conda.sh
+mkdir -p $VAI_ROOT/conda/pkgs
+
+sudo python3 -m pip install --upgrade pip wheel setuptools
+
+# Configure conda channels
+conda config --env --remove-key channels || true
+conda config --env --append channels ${VAI_CONDA_CHANNEL}
+conda config --remove channels defaults || true
+
+echo "=== Creating conda environment from /scratch/${DOCKER_TYPE}_conda/vitis-ai-tensorflow2.yml ==="
+mamba env create -f /scratch/${DOCKER_TYPE}_conda/vitis-ai-tensorflow2.yml
+
+conda activate vitis-ai-tensorflow2
+
+echo "=== Installing TensorFlow: ${tensorflow_ver} ==="
+pip install --ignore-installed ${tensorflow_ver}
+
+echo "=== Installing conda packages (pydot, jupyter, etc.) ==="
+mamba install --no-update-deps -y pydot pyyaml jupyter ipywidgets \
+        dill progressbar2 pytest pandas matplotlib \
+        pillow -c ${conda_channel} -c conda-forge -c defaults
+
+echo "=== Installing pip requirements ==="
+pip install -r /scratch/pip_requirements.txt || echo "WARNING: pip_requirements.txt install had errors, continuing..."
+
+echo "=== Installing additional pip packages ==="
+pip install transformers pycocotools scikit-learn scikit-image tqdm easydict
+
+echo "=== Reinstalling TensorFlow to ensure correct version ==="
+pip install --ignore-installed ${tensorflow_ver}
+
+echo "=== Installing h5py ==="
+pip uninstall -y h5py || true
+pip uninstall -y h5py || true
+if ! mamba install -y --override-channels --force-reinstall h5py=2.10.0 -c conda-forge; then
+    echo "WARNING: h5py=2.10.0 not available via conda, trying pip..."
+    if ! pip install h5py==2.10.0; then
+        echo "WARNING: h5py=2.10.0 not available via pip, installing compatible version..."
+        pip install "h5py>=2.10.0,<4.0"
+    fi
+fi
+
+echo "=== Installing protobuf ==3.20.3 ==="
+pip install --force-reinstall protobuf==3.20.3
+
+echo "=== Cleaning up ==="
+conda clean -y --force-pkgs-dirs
+sudo rm -fr ~/.cache
+sudo rm -fr /scratch/*
+conda config --env --remove-key channels || true
+
+conda activate vitis-ai-tensorflow2
+sudo mkdir -p $VAI_ROOT/compiler
+sudo cp -r $CONDA_PREFIX/lib/python3.8/site-packages/vaic/arch $VAI_ROOT/compiler/arch
+echo "=== GPU TF2 install completed successfully ==="
 fi

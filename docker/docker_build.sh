@@ -90,7 +90,7 @@ function execute
      echo "VAI_BASE: ${VAI_BASE}"
 
      echo "BUild Base image:${BASE_IMAGE} first"
-     buildcmd="docker build  --network=host \
+     buildcmd="docker build  --progress=plain --network=host \
            --build-arg DOCKER_TYPE=$DOCKER_TYPE \
                --build-arg VAI_BASE=${VAI_BASE} \
                -t ${BASE_IMAGE} $add_args  \
@@ -105,7 +105,7 @@ function execute
      exit 1
     fi
  fi
- buildcmd="docker build --network=host \
+ buildcmd="docker build --progress=plain --network=host \
      --build-arg TARGET_FRAMEWORK=$TARGET_FRAMEWORK \
      --build-arg DOCKER_TYPE=$DOCKER_TYPE \
      --build-arg XRT_URL=${XRT_URL} \

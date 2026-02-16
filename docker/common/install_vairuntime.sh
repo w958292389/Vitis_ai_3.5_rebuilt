@@ -5,13 +5,13 @@ set -ex
 echo ' Acquire::http::Timeout "600";' |tee -a /etc/apt/apt.conf.d/99timeout &&
 echo ' Acquire::Retries "3";' | tee -a /etc/apt/apt.conf.d/99timeout
 if [[ "${XRT_URL}" =~ ".deb" ]]; then
-   cd /tmp && wget --progress=dot:mega -O xrt.deb ${XRT_URL} \
+   cd /tmp && wget --progress=dot:mega --retry-connrefused --waitretry=5 --read-timeout=120 --timeout=60 -t 5 -O xrt.deb "${XRT_URL}" \
     && apt-get update -y \
     && apt-get install -y ./xrt.deb
  
 else
     # in case parsing xrt folder
-   cd /tmp && wget --progress=dot:mega  -r -nd  --no-parent -A "*`lsb_release -r -s`*-xrt.deb"  ${XRT_URL} \
+   cd /tmp && wget --progress=dot:mega --retry-connrefused --waitretry=5 --read-timeout=120 --timeout=60 -t 5 -r -nd --no-parent -A "*`lsb_release -r -s`*-xrt.deb" "${XRT_URL}" \
     && apt-get update -y \
     && apt-get install -y ./*xrt*.deb
 
@@ -23,12 +23,12 @@ if [[ $? -ne 0 ]];then
 fi
 
 if [[ "${XRM_URL}" =~ ".deb" ]]; then
-    wget --progress=dot:mega -O xrm.deb ${XRM_URL} \
+    wget --progress=dot:mega --retry-connrefused --waitretry=5 --read-timeout=120 --timeout=60 -t 5 -O xrm.deb "${XRM_URL}" \
       && apt-get install -y ./xrm.deb \
       && rm -fr /tmp/*
 
 else    # in case parsing xrt folder
-   wget --progress=dot:mega   -r -nd  --no-parent -A "*`lsb_release -r -s`*x86_64.deb"   ${XRM_URL} \
+   wget --progress=dot:mega --retry-connrefused --waitretry=5 --read-timeout=120 --timeout=60 -t 5 -r -nd --no-parent -A "*`lsb_release -r -s`*x86_64.deb" "${XRM_URL}" \
    && apt-get install -y ./*xrm*.deb \
    && rm -fr /tmp/*
 
@@ -40,7 +40,7 @@ fi
 
 if [[ "${VAI_DEB_CHANNEL}" =~ ".tar.gz" ]]; then
 #download link
-    cd /tmp/ && wget --progress=dot:mega -O vairuntime.tar.gz ${VAI_DEB_CHANNEL} \
+    cd /tmp/ && wget --progress=dot:mega --retry-connrefused --waitretry=5 --read-timeout=120 --timeout=60 -t 5 -O vairuntime.tar.gz "${VAI_DEB_CHANNEL}" \
      &&  tar xvf vairuntime.tar.gz \
      && apt-get install -y ./*/*.deb \
      && ldconfig \
