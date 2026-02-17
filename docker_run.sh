@@ -46,7 +46,8 @@ Options:
 
 Examples:
   ./docker_run.sh xilinx/vitis-ai-pytorch-gpu:3.5.0.001-77cb9e6ad
-  ./docker_run.sh -X xilinx/vitis-ai-tensorflow2-gpu:3.5.0.001-77cb9e6ad
+  ./docker_run.sh xilinx/vitis-ai-tensorflow2-gpu:3.5.0.001-cuda12.8
+  ./docker_run.sh -X xilinx/vitis-ai-tensorflow2-gpu:3.5.0.001-cuda12.8
   ./docker_run.sh -w /data/project xilinx/vitis-ai-pytorch-gpu:3.5.0.001-77cb9e6ad
   ./docker_run.sh xilinx/vitis-ai-pytorch-gpu:3.5.0.001-77cb9e6ad python my_script.py
 

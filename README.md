@@ -43,6 +43,17 @@ yes | ./docker_build.sh -t gpu -f pytorch 2>&1 | tee build_gpu_pytorch.log
 
 > `yes |` auto-accepts the license prompts. Pipe to `tee` to save build logs.
 
+#### Blackwell GPU (RTX PRO 4000 / RTX 5xxx)
+
+For NVIDIA Blackwell GPUs (sm_120 / compute capability 12.0), use the dedicated CUDA 12.8 build:
+
+```bash
+cd docker
+bash build_tf2_cuda12.sh 2>&1 | tee build_tf2_cuda12.8.log
+```
+
+This builds `xilinx/vitis-ai-tensorflow2-gpu:3.5.0.001-cuda12.8` with TF 2.13.1 and GPU support via PTX JIT compilation. Note: the first GPU computation will take ~30 minutes for kernel compilation, after which kernels are cached.
+
 The build produces two stages:
 1. **Base image** (conda + system packages): `xilinx/vitis-ai-gpu-<fw>-base:latest`
 2. **Final image** (framework + Vitis AI tools): `xilinx/vitis-ai-<framework>-gpu:<version>-<git_hash>`
@@ -99,6 +110,7 @@ This drops you into a bash shell inside the container with:
 
 | Type | Framework | Build command | Image tag |
 |------|-----------|---------------|-----------|
+| GPU  | TF2 (Blackwell) | `bash build_tf2_cuda12.sh` | `xilinx/vitis-ai-tensorflow2-gpu:3.5.0.001-cuda12.8` |
 | GPU  | TensorFlow 2 | `./docker_build.sh -t gpu -f tf2` | `xilinx/vitis-ai-tensorflow2-gpu:<ver>` |
 | GPU  | PyTorch | `./docker_build.sh -t gpu -f pytorch` | `xilinx/vitis-ai-pytorch-gpu:<ver>` |
 | GPU  | TensorFlow 1.15 | `./docker_build.sh -t gpu -f tf1` | `xilinx/vitis-ai-tensorflow-gpu:<ver>` |
@@ -141,7 +153,18 @@ Default Docker BuildKit output (`--progress=auto`) collapses build output, makin
 
 **Fix**: Added `--progress=plain` to both `docker build` commands (base image and final image).
 
-### 6. `docker_run.sh` (repo root) — Simplified for local builds
+### 6. `docker/build_tf2_cuda12.sh` + `install_tf2_cuda12.sh` + Dockerfile — Blackwell GPU support
+
+NVIDIA Blackwell GPUs (sm_120) aren't supported by TF 2.12's pre-built kernels. These new files build a CUDA 12.8-based image with TF 2.13.1 that uses PTX JIT compilation for sm_120.
+
+Key details:
+- **Base image**: `nvidia/cuda:12.8.1-cudnn-devel-ubuntu20.04`
+- **TF 2.13.1**: Max version for Python 3.8 (conda env constraint)
+- **Keras 2.12**: Downgraded from 2.13 because vai_q_tensorflow2 needs `keras.engine` module
+- **nvidia-\*-cu11 pip packages**: Required for TF 2.13 pip wheel GPU detection + LD_LIBRARY_PATH
+- **h5py >= 3.0**: Old h5py 2.10.0 incompatible with numpy in TF 2.13
+
+### 7. `docker_run.sh` (repo root) — Simplified for local builds
 
 The original script pulled images from a registry and had lengthy license prompts. Rewritten for locally-built images.
 
@@ -161,6 +184,8 @@ Vitis-AI/
       install_tf2.sh         # TensorFlow 2 install      [MODIFIED]
       install_torch.sh       # PyTorch install            [MODIFIED]
       install_vairuntime.sh  # Vitis AI runtime install   [MODIFIED]
+      install_tf2_cuda12.sh  # TF2 for Blackwell GPUs    [NEW]
+    build_tf2_cuda12.sh    # Blackwell GPU build script  [NEW]
     dockerfiles/
       VERSION.txt            # Version string (3.5.0.001)
       ubuntu-vai/
@@ -168,6 +193,7 @@ Vitis-AI/
         vitis-ai-cpu.Dockerfile
         vitis-ai-gpu.Dockerfile
         vitis-ai-rocm.Dockerfile
+        vitis-ai-gpu-tf2-cuda12.Dockerfile  # Blackwell  [NEW]
     gpu_conda/               # GPU conda environment YMLs
     cpu_conda/               # CPU conda environment YMLs
 ```
